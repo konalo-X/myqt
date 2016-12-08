@@ -17,7 +17,7 @@ ProgressDlg::ProgressDlg(QWidget *parent)
     comboBox->addItem(tr("ProgressBar"));
     comboBox->addItem(tr("ProgressDialog"));
 
-    QProgressBar *progressBar=new QProgressBar(this);
+     progressBar=new QProgressBar(this);
 //progressbar->setSizePolicy();
 
     startBtn=new QPushButton("开始");
