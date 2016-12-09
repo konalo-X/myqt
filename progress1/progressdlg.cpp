@@ -56,6 +56,7 @@ void ProgressDlg::startProgress()
         */
         //comboBox->setCurrentIndex(1);
         progressBar->setRange(0,num);
+        progressBar->setFormat(tr("%m"));
         for(int i=1;i<num+1;i++)
         progressBar->setValue(i);
     }
@@ -70,7 +71,7 @@ void ProgressDlg::startProgress()
         progressDialog->setLabelText("Copying.....");
         progressDialog->setCancelButtonText("Cancel");
         progressDialog->setRange(0,num);
-        for(int i=1;i<num+1;i++)
+        for(int i=0;i<num+1;i++)
         {
             progressDialog->setValue(i);
             if(progressDialog->wasCanceled())
