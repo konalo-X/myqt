@@ -14,6 +14,27 @@ ImgProcessor::ImgProcessor(QWidget *parent)
     setWindowTitle(tr("Easy Word"));        //设置窗口标题
     showWidget=new ShowWidget(this);
     setCentralWidget(showWidget);   //这只showWidget 为中心部件
+    fontLabel1=new QLabel(tr("字体"));
+    fontComboBox=new QFontComboBox;
+    fontComboBox->setFontFilters(QFontComboBox::ScalableFonts);//?
+    fontLabel2=new QLabel(tr("字号"));
+    sizeComboBox=new QComboBox;
+    QFontDatabase db;
+    foreach(int size,db.standardSizes())
+        sizeComboBox->addItem(QString::number(size));
+    boldBtn=new QToolButton;
+    boldBtn->setIcon(QIcon("/Users/konalo/image/bold.png"));
+    boldBtn->setCheckable(true);
+    italicBtn=new QToolButton;
+    italicBtn->setIcon(QIcon("/Users/konalo/image/italic.png"));
+    italicBtn->setCheckable(true);
+    underlineBtn=new QToolButton;
+    underlineBtn->setIcon(QIcon("/Users/konalo/image/underline.png"));
+    underlineBtn->setCheckable(true);
+    colorBtn=new QToolButton;
+    colorBtn->setIcon(QIcon("/Users/konalo/image/color.png"));
+    colorBtn->setCheckable(true);
+
     /*创建动作 菜单 工具栏的函数*/
     createActions();
     createMenus();
@@ -84,26 +105,33 @@ void ImgProcessor::createActions()
     //"放大"动作
     zoomInAction=new QAction(tr("放大"),this);
     zoomInAction->setStatusTip(tr("放大一张图片"));
+    connect(zoomInAction,SIGNAL(triggered()),this,SLOT(showZoomIn()));
     //"缩小"动作
     zoomOutAction=new QAction(tr("缩小"),this);
     zoomOutAction->setStatusTip(tr("缩小一张图片"));
+    connect(zoomOutAction,SIGNAL(triggered()),this,SLOT(showZoomOut()));
     //旋转动作
     //旋转90°
     rotate90Action=new QAction(tr("旋转90°"),this);
     rotate90Action->setStatusTip(tr("将图像旋转90°"));
+    connect(rotate90Action,SIGNAL(triggered()),this,SLOT(showRotate90()));
     //旋转180°
     rotate180Action=new QAction(tr("旋转180°"),this);
     rotate180Action->setStatusTip(tr("将图像旋转180°"));
+    connect(rotate180Action,SIGNAL(triggered()),this,SLOT(showRotate180()));
     //旋转270°
     rotate270Action=new QAction(tr("旋转270°"),this);
     rotate270Action->setStatusTip(tr("将图像旋转270°"));
+    connect(rotate270Action,SIGNAL(triggered()),this,SLOT(showRotate270()));
     //实现图像镜像动作
     //纵向镜像
     mirrorVerticalAction=new QAction(tr("纵向镜像"),this);
     mirrorVerticalAction->setStatusTip(tr("对一幅图做纵向镜像"));
+    connect(mirrorVerticalAction,SIGNAL(triggered()),this,SLOT(showMirrorVertical()));
     //横向镜像
      mirroeHorizontalAction=new QAction(tr("横向镜像"),this);
      mirroeHorizontalAction->setStatusTip(tr("对一幅图做横向镜像"));
+     connect(mirroeHorizontalAction,SIGNAL(triggered()),this,SLOT(showMirrorHorizontal()));
     //实现撤销和恢复动作
      //撤销和恢复
      undoAction=new QAction("撤销",this);
@@ -135,7 +163,6 @@ void ImgProcessor::createMenus()
     zoomMenu->addSeparator();
     zoomMenu->addAction(zoomInAction);
     zoomMenu->addAction(zoomOutAction);
-
     //旋转菜单
     rotateMenu=menuBar()->addMenu(tr("旋转"));
     rotateMenu->addAction(rotate90Action);
@@ -145,7 +172,7 @@ void ImgProcessor::createMenus()
     //镜像菜单
     mirrorMenu=menuBar()->addMenu(tr("镜像"));
     mirrorMenu->addAction(mirrorVerticalAction);
-    mirrorMenu->addAction(mirrorVerticalAction);
+    mirrorMenu->addAction(mirroeHorizontalAction);
 
 
 }
@@ -178,13 +205,28 @@ void ImgProcessor::createToolBars()
     doToolBar->addAction(undoAction);
     doToolBar->addAction(redoAction);
 
+    mirrorTool=addToolBar("Mirror");
+    mirrorTool->addAction(mirrorVerticalAction);
+    mirrorTool->addAction(mirroeHorizontalAction);
 
+    //字体栏
+    fontToolBar=addToolBar("Font");
+    fontToolBar->addWidget(fontLabel1);
+    fontToolBar->addWidget(fontComboBox);
+    fontToolBar->addWidget(fontLabel2);
+    fontToolBar->addWidget(sizeComboBox);
+    fontToolBar->addSeparator();
+    fontToolBar->addWidget(boldBtn);
+    fontToolBar->addWidget(italicBtn);
+    fontToolBar->addWidget(underlineBtn);
+    fontToolBar->addSeparator();
+    fontToolBar->addWidget(colorBtn);
 
 }
 
 void ImgProcessor::loadFile(QString filename)
 {
-    printf("file name:%s\n",filename.data());
+    //printf("file name:%s\n",filename.data());
     QFile file(filename);
     if(file.open(QIODevice::ReadOnly|QIODevice::Text))
     {
@@ -233,7 +275,9 @@ void ImgProcessor::openFile()
 void ImgProcessor::saveFile()
 {
 
-    filename=QFileDialog::getSaveFileName(this);
+    filename=QFileDialog::getSaveFileName(this,tr("Save File"),
+                                          "/Users/konalo/myqt/新建文本.txt"
+                                          );
 
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -271,6 +315,115 @@ void ImgProcessor::showPrintImage()
         //KeepAspectRatioByExpanding 保持长宽比,突破一张纸
         //IgnoreAspectRatio  忽略长宽比,铺满一张纸
        // This enum type defines what happens to the aspect(朝向) ratio(比率) when scaling an rectangle.
-
+       painter.setViewport(rec.x(),rec.y(),size.width(),size.height());
+       painter.setWindow(img.rect());//设置QPainter窗口大小为图像大小
+       painter.drawImage(0,0,img);//打印图像
     }
+}
+
+void ImgProcessor::showZoomIn()
+{
+    if(img.isNull())
+        return;
+    QMatrix matrix;//QMatrix 类提供二维世界坐标转换功能
+    matrix.scale(2,2);
+    //QImage img1=img;
+    img=img.transformed(matrix);
+    //重新显示设置图形
+    showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
+}
+
+void ImgProcessor::showZoomOut()
+{
+    if(img.isNull())
+        return;
+    QMatrix matrix;
+    matrix.scale(0.5,0.5);
+    //QImage img1=img;
+    img=img.transformed(matrix);
+    //重新显示设置图形
+    showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
+
+}
+
+void ImgProcessor::showRotate90()
+{
+    if(img.isNull())
+        return;
+    QMatrix matrix;
+    matrix.rotate(90);
+    img=img.transformed(matrix);
+    showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
+
+}
+
+void ImgProcessor::showRotate180()
+{
+    if(img.isNull())
+        return;
+    QMatrix matrix;
+    matrix.rotate(180);
+    img=img.transformed(matrix);
+    showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
+}
+
+void ImgProcessor::showRotate270()
+{
+    if(img.isNull())
+        return;
+    QMatrix matrix;
+    matrix.rotate(270);
+    img=img.transformed(matrix);
+    showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
+}
+
+void ImgProcessor::showMirrorVertical()
+{
+    if(img.isNull())
+        return;
+    img=img.mirrored(false,true);
+    showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
+}
+
+void ImgProcessor::showMirrorHorizontal()
+{
+    if(img.isNull())
+        return;
+    img=img.mirrored(true,false);
+    showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
+}
+
+void ImgProcessor::showFontComboBox(QString comboStr)
+{
+
+}
+
+void ImgProcessor::ShowSizeSpinBox(QString spinValue)
+{
+
+}
+
+void ImgProcessor::showBildBtn()
+{
+
+}
+
+void ImgProcessor::showItalicBtn()
+{
+
+}
+
+void ImgProcessor::showUnderlineBtn()
+{
+
+}
+
+void ImgProcessor::showColorBtn()
+{
+
+}
+
+void ImgProcessor::showCurrentFormatChanged(const QTextCharFormat &fmt)
+{
+
 }
