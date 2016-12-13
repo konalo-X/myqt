@@ -5,6 +5,9 @@
 #include<QDialog>
 #include<QMessageBox>
 #include<QFileDialog>
+#include<QPrintDialog>
+#include<QPrinter>
+#include<QPainter>
 ImgProcessor::ImgProcessor(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -72,9 +75,12 @@ void ImgProcessor::createActions()
     //"打印"动作
     printTextAction=new QAction(tr("打印文本"),this);
     printTextAction->setStatusTip(tr("打印一个文本"));
+    printTextAction->setShortcut(tr("Ctrl+P"));
+    connect(printTextAction,SIGNAL(triggered()),this,SLOT(showPrintText()));
     //"打印图像"动作
     printImageAction=new QAction(tr("打印图像"),this);
     printImageAction->setStatusTip(tr("打印一副图像"));
+    connect(printImageAction,SIGNAL(triggered()),this,SLOT(showPrintImage()));
     //"放大"动作
     zoomInAction=new QAction(tr("放大"),this);
     zoomInAction->setStatusTip(tr("放大一张图片"));
@@ -185,13 +191,11 @@ void ImgProcessor::loadFile(QString filename)
         QTextStream textStream(&file);
         while(!textStream.atEnd())
         {
-            showWidget->text->append(textStream.readLine());
+           showWidget->text->append(textStream.readLine());
             printf("read line \n");
             printf("end\n");
         }
     }
-
-
 }
 
 void ImgProcessor::showAbout()
@@ -238,4 +242,35 @@ void ImgProcessor::saveFile()
           QTextStream out(&file);
           out<<showWidget->text->toPlainText() ;
 
+}
+
+void ImgProcessor::showPrintText()
+{
+    QPrinter printer;
+    QPrintDialog printDialog(&printer,this);
+    if(printDialog.exec())
+    {
+        //获得QTextEdit对象的文档
+        QTextDocument *doc=showWidget->text->document();
+        doc->print(&printer);
+    }
+}
+
+void ImgProcessor::showPrintImage()
+{
+    QPrinter printer;
+    QPrintDialog printerDialog(&printer,this);
+    if(printerDialog.exec())//判断打印对话框显示后用户是否单击"打印"按钮
+    {
+        QPainter painter(&printer);//连接打印机,在打印机上画图
+        QRect rec=painter.viewport();//返回图的矩形视图
+        QSize size=img.size();//返回长和宽
+        size.scale(rec.size(),Qt::KeepAspectRatio);//void QSize::scale(const QSize &size, Qt::AspectRatioMode mode)
+        //Scales(缩放) the size to a rectangle with the given size, according to the specified mode.
+   //enum Qt::AspectRatioMode 有三种KeepAspectRatio 保持长宽比率,自一张纸最大
+        //KeepAspectRatioByExpanding 保持长宽比,突破一张纸
+        //IgnoreAspectRatio  忽略长宽比,铺满一张纸
+       // This enum type defines what happens to the aspect(朝向) ratio(比率) when scaling an rectangle.
+
+    }
 }

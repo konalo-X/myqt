@@ -32,6 +32,8 @@ protected slots:
     void newFile();
     void openFile();
     void saveFile();
+    void showPrintText();
+    void showPrintImage();
 private:
     QMenu *fileMenu;                    //各项菜单栏
     QMenu*zoomMenu;
