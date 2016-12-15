@@ -534,7 +534,7 @@ void ImgProcessor::showAlignment(QAction *act)
         showWidget->text->setAlignment(Qt::AlignCenter);
     if(act=justifyAction)
         showWidget->text->setAlignment((Qt::AlignJustify));
-    showWidget->text->update();
+    
 }
 
 void ImgProcessor::showCursorPositionChanged()

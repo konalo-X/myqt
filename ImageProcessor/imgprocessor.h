@@ -34,6 +34,26 @@ protected slots:
     void saveFile();
     void showPrintText();
     void showPrintImage();
+    void showZoomIn();
+    void showZoomOut();
+    void showRotate90();
+    void showRotate180();
+    void showRotate270();
+    void showMirrorVertical();
+    void showMirrorHorizontal();
+    //字体
+protected slots:
+    void showFontComboBox(QString comboStr);
+    void ShowSizeSpinBox(QString spinValue);
+    void showBildBtn();
+    void showItalicBtn();
+    void showUnderlineBtn();
+    void showColorBtn();
+    void showCurrentFormatChanged(const QTextCharFormat &fmt);
+    //段落
+    void showList(int);
+    void showAlignment(QAction *);
+    void showCursorPositionChanged();
 private:
     QMenu *fileMenu;                    //各项菜单栏
     QMenu*zoomMenu;
@@ -66,6 +86,25 @@ private:
     QToolBar*rotateTool;
     QToolBar*mirrorTool;
     QToolBar*doToolBar;
+    /*字体设置*/
+    QLabel *fontLabel1;
+    QFontComboBox *fontComboBox;
+    QLabel *fontLabel2;
+    QComboBox *sizeComboBox;
+    QToolButton *boldBtn;
+    QToolButton *italicBtn;
+    QToolButton *underlineBtn;
+    QToolButton *colorBtn;
+    QToolBar *fontToolBar;
+    /*段落设置*/
+    QLabel *listlabel;
+    QComboBox *listComboBox;
+    QActionGroup *actGrp;
+    QAction *leftAction;
+    QAction *rightAction;
+    QAction *centerAction;
+    QAction *justifyAction;
+    QToolBar *listToolBar;
 
 };
 
