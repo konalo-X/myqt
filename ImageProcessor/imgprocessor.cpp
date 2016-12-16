@@ -10,6 +10,7 @@
 #include<QPainter>
 #include<QColorDialog>
 #include<QTextEdit>
+#include<QTextList>
 ImgProcessor::ImgProcessor(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -234,7 +235,7 @@ void ImgProcessor::createMenus()
 void ImgProcessor::createToolBars()
 {
     //文件工具条
-    fileTool=addToolBar("File");
+    fileTool=addToolBar("File111");
     fileTool->addAction(openFileAction);
     fileTool->addAction(newFileAction);
     fileTool->addAction(SaveFileAction);
@@ -416,7 +417,7 @@ void ImgProcessor::showZoomOut()
 
 }
 
-void ImgProcessor::showRotate90()
+void ImgProcessor::showRotate90()                       //旋转90°
 {
     if(img.isNull())
         return;
@@ -427,7 +428,7 @@ void ImgProcessor::showRotate90()
 
 }
 
-void ImgProcessor::showRotate180()
+void ImgProcessor::showRotate180()                      //旋转180°
 {
     if(img.isNull())
         return;
@@ -437,7 +438,7 @@ void ImgProcessor::showRotate180()
     showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
 }
 
-void ImgProcessor::showRotate270()
+void ImgProcessor::showRotate270()                      //旋转270°
 {
     if(img.isNull())
         return;
@@ -447,7 +448,7 @@ void ImgProcessor::showRotate270()
     showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
 }
 
-void ImgProcessor::showMirrorVertical()
+void ImgProcessor::showMirrorVertical()                 //水平镜像
 {
     if(img.isNull())
         return;
@@ -455,7 +456,7 @@ void ImgProcessor::showMirrorVertical()
     showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
 }
 
-void ImgProcessor::showMirrorHorizontal()
+void ImgProcessor::showMirrorHorizontal()               //垂直镜像
 {
     if(img.isNull())
         return;
@@ -477,21 +478,21 @@ void ImgProcessor::ShowSizeSpinBox(QString spinValue)
     showWidget->text->mergeCurrentCharFormat(fmt);
 }
 
-void ImgProcessor::showBildBtn()
+void ImgProcessor::showBildBtn()                        //粗体设置
 {
     QTextCharFormat fmt;
     fmt.setFontWeight(boldBtn->isChecked()?QFont::Bold : QFont::Normal);
     showWidget->text->mergeCurrentCharFormat(fmt);
 }
 
-void ImgProcessor::showItalicBtn()
+void ImgProcessor::showItalicBtn()                      //斜体设置
 {
     QTextCharFormat fmt;
     fmt.setFontItalic(italicBtn->isChecked());
     showWidget->text->setCurrentCharFormat(fmt);
 }
 
-void ImgProcessor::showUnderlineBtn()
+void ImgProcessor::showUnderlineBtn()                   //下划线设置
 {
     QTextCharFormat fmt;
     fmt.setFontUnderline(underlineBtn->isChecked());
@@ -519,22 +520,84 @@ void ImgProcessor::showCurrentFormatChanged(const QTextCharFormat &fmt)
 }
 
 /*段落*/
-void ImgProcessor::showList(int)
+void ImgProcessor::showList(int index)
 {
+    //获得编辑框的QTextCursor对象指针
+    QTextCursor cursor=showWidget->text->textCursor();
+    if(index!=0)
+    {
+        QTextListFormat::Style style=QTextListFormat::ListDisc;//?
+        switch(index)
+        {
+        default:
+        case 1:
+            style=QTextListFormat::ListDisc;
+            break;
+        case 2:
+            style=QTextListFormat::ListCircle;
+            break;
+        case 3:
+            style=QTextListFormat::ListSquare;
+            break;
+        case 4:
+            style=QTextListFormat::ListDecimal;
+            break;
+        case 5:
+            style=QTextListFormat::ListLowerAlpha;
+            break;
+        case 6:
+            style=QTextListFormat::ListUpperAlpha;
+            break;
+        case 7:
+            style=QTextListFormat::ListLowerRoman;
+            break;
+        case 8:
+            style=QTextListFormat::ListUpperRoman;
+            break;
+        }
+        /*设置缩进值*/
+        cursor.beginEditBlock();//?
+        QTextBlockFormat blockfmt=cursor.blockFormat();
+        QTextListFormat listfmt;
+        if(cursor.currentList())
+        {
+            //QTextList *TL=cursor.currentList();
+            listfmt=cursor.currentList()->format();
+        }
+        else
+        {
+            listfmt.setIndent(blockfmt.indent()+1);
+            blockfmt.setIndent(0);
+            cursor.setBlockFormat(blockfmt);
+        }
+        listfmt.setStyle(style);
+        cursor.createList(listfmt);
+        cursor.endEditBlock();
+    }
+    else
+    {
+        QTextBlockFormat bfmt;
+        bfmt.setObjectIndex(-1);
+        cursor.mergeBlockFormat(bfmt);
+    }
 
 }
 
 void ImgProcessor::showAlignment(QAction *act)
 {
+    //QTextCursor cursor=showWidget->text->textCursor();
+
     if(act==leftAction)
         showWidget->text->setAlignment(Qt::AlignLeft);
     if(act==rightAction)
         showWidget->text->setAlignment(Qt::AlignRight);
     if(act==centerAction)
         showWidget->text->setAlignment(Qt::AlignCenter);
-    if(act=justifyAction)
+    if(act==justifyAction)
         showWidget->text->setAlignment((Qt::AlignJustify));
-    showWidget->text->update();
+    //QTextBlockFormat fmt=cursor.blockFormat();
+    //cursor.mergeBlockFormat(fmt);
+
 }
 
 void ImgProcessor::showCursorPositionChanged()
