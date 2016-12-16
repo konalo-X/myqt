@@ -12,7 +12,7 @@
 #include<QTextEdit>
 #include<QTextList>
 ImgProcessor::ImgProcessor(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent)                           //构造函数
 {
     setWindowTitle(tr("Easy Word"));        //设置窗口标题
     showWidget=new ShowWidget(this);
@@ -73,12 +73,12 @@ ImgProcessor::ImgProcessor(QWidget *parent)
     connect(showWidget->text,SIGNAL(cursorPositionChanged()),this,SLOT(showCursorPositionChanged()));
 }
 
-ImgProcessor::~ImgProcessor()
+ImgProcessor::~ImgProcessor()                       //析构函数
 {
 
 }
 
-void ImgProcessor::createActions()
+void ImgProcessor::createActions()                  //创建动作
 {
     //"打开"动作
     openFileAction =new QAction(tr("打开"),this);
@@ -198,7 +198,7 @@ void ImgProcessor::createActions()
 
 /*      菜单栏     */
 
-void ImgProcessor::createMenus()
+void ImgProcessor::createMenus()                    //创建菜单栏
 {
     //文件菜单
     fileMenu=menuBar()->addMenu(tr("文件"));
@@ -232,7 +232,7 @@ void ImgProcessor::createMenus()
 
 }
 //工具栏
-void ImgProcessor::createToolBars()
+void ImgProcessor::createToolBars()                 //创建工具栏
 {
     //文件工具条
     fileTool=addToolBar("File111");
@@ -286,7 +286,7 @@ void ImgProcessor::createToolBars()
 
 }
 
-void ImgProcessor::loadFile(QString filename)
+void ImgProcessor::loadFile(QString filename)       //加载文档
 {
     //printf("file name:%s\n",filename.data());
     QFile file(filename);
@@ -302,7 +302,7 @@ void ImgProcessor::loadFile(QString filename)
     }
 }
 
-void ImgProcessor::mergeFormat(QTextCharFormat fmt)
+void ImgProcessor::mergeFormat(QTextCharFormat fmt) //合并格式
 {
     QTextCursor cursor=showWidget->text->textCursor();                                  //获得光标位置(需要改变格式位置的光标)
     if(!cursor.hasSelection())
@@ -311,20 +311,20 @@ void ImgProcessor::mergeFormat(QTextCharFormat fmt)
     showWidget->text->mergeCurrentCharFormat(fmt);
 }
 
-void ImgProcessor::showAbout()
+void ImgProcessor::showAbout()                      //关于
 {
     //QDialog *d=new QDialog(this);
     QMessageBox::about(this,"关于","This software is for learning,developed by konalo\n all Copyright©️ reserved ");
     return;
 }
 
-void ImgProcessor::newFile()
+void ImgProcessor::newFile()                        //新建文档
 {
     ImgProcessor *newfile=new ImgProcessor;
     newfile->show();
 }
 
-void ImgProcessor::openFile()
+void ImgProcessor::openFile()                       //打开文档
 {
 
     filename=QFileDialog::getOpenFileName(this,"打开文件...","/Users/konalo","*.txt  :: *.cpp :: *.hpp :: *.h :: *.c :: *.pro");
@@ -343,7 +343,7 @@ void ImgProcessor::openFile()
     }
 }
 
-void ImgProcessor::saveFile()
+void ImgProcessor::saveFile()                       //保存文档
 {
 
     filename=QFileDialog::getSaveFileName(this,tr("Save File"),
@@ -359,7 +359,7 @@ void ImgProcessor::saveFile()
 
 }
 
-void ImgProcessor::showPrintText()
+void ImgProcessor::showPrintText()                  //打印文本
 {
     QPrinter printer;
     QPrintDialog printDialog(&printer,this);
@@ -371,7 +371,7 @@ void ImgProcessor::showPrintText()
     }
 }
 
-void ImgProcessor::showPrintImage()
+void ImgProcessor::showPrintImage()                 //打印图片
 {
     QPrinter printer;
     QPrintDialog printerDialog(&printer,this);
@@ -392,7 +392,7 @@ void ImgProcessor::showPrintImage()
     }
 }
 
-void ImgProcessor::showZoomIn()
+void ImgProcessor::showZoomIn()                     //缩放图片
 {
     if(img.isNull())
         return;
@@ -404,7 +404,7 @@ void ImgProcessor::showZoomIn()
     showWidget->imageLabel->setPixmap(QPixmap::fromImage(img));
 }
 
-void ImgProcessor::showZoomOut()
+void ImgProcessor::showZoomOut()                    //放大图片
 {
     if(img.isNull())
         return;
