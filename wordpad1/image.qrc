@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>win10.png</file>
+        <file>pad.png</file>
+    </qresource>
+</RCC>
